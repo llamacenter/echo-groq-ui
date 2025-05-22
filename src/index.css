@@ -5,33 +5,33 @@
 
 @layer base {
   :root {
-    --background: 224 71% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 222 73% 53%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 252 59% 48%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 250 87% 67%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 270 67% 47%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
 
-    --accent: 250 87% 97%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222 73% 53%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
 
     --radius: 0.75rem;
   }
@@ -48,14 +48,22 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-lg;
+    @apply bg-slate-900/80 backdrop-blur-md border border-slate-800/50 shadow-lg;
   }
   
-  .glass-dark {
-    @apply bg-slate-900/70 backdrop-blur-md border border-slate-800/50 shadow-lg;
+  .glass-light {
+    @apply bg-slate-800/70 backdrop-blur-md border border-slate-700/50 shadow-lg;
   }
   
   .text-gradient {
-    @apply bg-gradient-to-br from-prism-600 to-violet-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent;
+  }
+
+  .animate-glow {
+    @apply animate-pulse;
+  }
+
+  .card-halo {
+    @apply before:absolute before:inset-0 before:-z-10 before:rounded-xl before:bg-gradient-to-r before:from-violet-500/25 before:via-indigo-500/25 before:to-purple-500/25 before:p-0.5 before:opacity-0 hover:before:opacity-100 before:transition;
   }
 }

@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from "react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { Message, ChatStatus, ModelOption } from "@/types/chat";
 
 export const MODELS: ModelOption[] = [
@@ -34,7 +34,15 @@ export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [status, setStatus] = useState<ChatStatus>("idle");
   const [selectedModel, setSelectedModel] = useState<ModelOption>(MODELS[0]);
-  const [apiKey, setApiKey] = useState<string>("");
+  const [apiKey, setApiKey] = useState<string>(() => {
+    return localStorage.getItem("groq_api_key") || "";
+  });
+  
+  useEffect(() => {
+    if (apiKey) {
+      localStorage.setItem("groq_api_key", apiKey);
+    }
+  }, [apiKey]);
   
   const addMessage = useCallback((content: string, role: 'user' | 'assistant') => {
     const newMessage: Message = {
@@ -62,39 +70,40 @@ export function useChat() {
     setStatus("loading");
     
     try {
-      // Simulate API call for now
-      setTimeout(() => {
-        const response = "This is a simulated response from the AI model. In a real implementation, this would be the response from the Groq API based on the user's input.";
-        addMessage(response, "assistant");
-        setStatus("idle");
-      }, 1500);
+      // Call the Groq API
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: selectedModel.id,
+          messages: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })).concat([{ role: 'user', content }]),
+          temperature: 0.7,
+          max_tokens: 1024
+        })
+      });
       
-      // In a real implementation, you would call the Groq API here
-      // const response = await fetch('https://api.groq.com/v1/completions', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${apiKey}`,
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({
-      //     model: selectedModel.id,
-      //     messages: messages.map(msg => ({
-      //       role: msg.role,
-      //       content: msg.content
-      //     })),
-      //     max_tokens: 1024
-      //   })
-      // });
-      // 
-      // const data = await response.json();
-      // addMessage(data.choices[0].message.content, "assistant");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Error calling Groq API');
+      }
+      
+      const data = await response.json();
+      const assistantResponse = data.choices[0].message.content;
+      addMessage(assistantResponse, "assistant");
       
     } catch (error) {
       console.error("Error calling Groq API:", error);
-      toast.error("Error connecting to Groq API");
-      setStatus("error");
+      toast.error(error instanceof Error ? error.message : "Error connecting to Groq API");
+    } finally {
+      setStatus("idle");
     }
-  }, [addMessage, apiKey, selectedModel]);
+  }, [addMessage, apiKey, selectedModel, messages]);
   
   const clearChat = useCallback(() => {
     setMessages([]);
