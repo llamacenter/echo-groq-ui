@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { Message, ChatStatus, ModelOption } from "@/types/chat";
 
+// Updated model list without deprecated models
 export const MODELS: ModelOption[] = [
   {
     id: "llama3-8b-8192",
@@ -17,18 +18,21 @@ export const MODELS: ModelOption[] = [
     maxTokens: 8192,
   },
   {
-    id: "mixtral-8x7b-32768",
-    name: "Mixtral 8x7B",
-    description: "Mixture of experts model with 8x7B parameters",
-    maxTokens: 32768,
+    id: "claude-3-opus-20240229",
+    name: "Claude 3 Opus",
+    description: "Most powerful model in the Claude family",
+    maxTokens: 4096,
   },
   {
-    id: "gemma-7b-it",
-    name: "Gemma 7B",
-    description: "Google's lightweight 7B instruction-tuned model",
-    maxTokens: 8192,
+    id: "claude-3-sonnet-20240229",
+    name: "Claude 3 Sonnet",
+    description: "Balanced performance and efficiency",
+    maxTokens: 4096,
   }
 ];
+
+// Default API key for fallback when user doesn't provide one
+const DEFAULT_API_KEY = "gsk_XDGddw9LqwN5vpqMgWH6mpDewfn1ofNG4WUQm0a5TU";
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -62,10 +66,8 @@ export function useChat() {
     // Add user message
     addMessage(content, "user");
     
-    if (!apiKey) {
-      toast.error("Please enter your Groq API key");
-      return;
-    }
+    // Use provided API key or fallback to default
+    const keyToUse = apiKey || DEFAULT_API_KEY;
     
     setStatus("loading");
     
@@ -74,7 +76,7 @@ export function useChat() {
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${keyToUse}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -100,10 +102,28 @@ export function useChat() {
     } catch (error) {
       console.error("Error calling Groq API:", error);
       toast.error(error instanceof Error ? error.message : "Error connecting to Groq API");
+      throw error; // Re-throw to allow retry handling
     } finally {
       setStatus("idle");
     }
   }, [addMessage, apiKey, selectedModel, messages]);
+  
+  const retryLastMessage = useCallback(async () => {
+    if (messages.length < 1) return;
+    
+    // Find the last user message
+    const lastUserMessageIndex = [...messages].reverse().findIndex(m => m.role === 'user');
+    
+    if (lastUserMessageIndex === -1) return;
+    
+    const lastUserMessage = messages[messages.length - 1 - lastUserMessageIndex];
+    
+    // Remove all messages after the last user message
+    setMessages(prev => prev.slice(0, messages.length - lastUserMessageIndex));
+    
+    // Resend the message
+    await sendMessage(lastUserMessage.content);
+  }, [messages, sendMessage]);
   
   const clearChat = useCallback(() => {
     setMessages([]);
@@ -117,6 +137,7 @@ export function useChat() {
     apiKey,
     setApiKey,
     sendMessage,
-    clearChat
+    clearChat,
+    retryLastMessage
   };
 }

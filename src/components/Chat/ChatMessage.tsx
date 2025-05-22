@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { PopIn } from '@/components/UI/AnimatedContainer';
 import { User, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 interface ChatMessageProps {
   message: Message;
@@ -72,7 +73,15 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
           </span>
         </div>
         <div className="prose prose-sm max-w-none prose-invert">
-          {rendered}
+          {message.role === 'assistant' && isLatest ? (
+            <ReactMarkdown className="markdown">
+              {rendered}
+            </ReactMarkdown>
+          ) : (
+            <ReactMarkdown className="markdown">
+              {message.content}
+            </ReactMarkdown>
+          )}
         </div>
       </div>
     </PopIn>
