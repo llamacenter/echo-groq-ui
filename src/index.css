@@ -5,6 +5,38 @@
 
 @layer base {
   :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
@@ -32,8 +64,6 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
-
-    --radius: 0.75rem;
   }
 
   * {
@@ -48,15 +78,18 @@
 
 @layer utilities {
   .glass {
-    @apply bg-slate-900/80 backdrop-blur-md border border-slate-800/50 shadow-lg;
+    @apply dark:bg-slate-900/80 dark:backdrop-blur-md dark:border dark:border-slate-800/50 dark:shadow-lg
+           bg-white/80 backdrop-blur-md border border-slate-200/50 shadow-lg;
   }
   
   .glass-light {
-    @apply bg-slate-800/70 backdrop-blur-md border border-slate-700/50 shadow-lg;
+    @apply dark:bg-slate-800/70 dark:backdrop-blur-md dark:border dark:border-slate-700/50 dark:shadow-lg
+           bg-white/60 backdrop-blur-md border border-slate-300/50 shadow-lg;
   }
   
   .text-gradient {
-    @apply bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent;
+    @apply dark:bg-gradient-to-br dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 dark:bg-clip-text dark:text-transparent
+           bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent;
   }
 
   .animate-glow {
@@ -64,29 +97,32 @@
   }
 
   .card-halo {
-    @apply before:absolute before:inset-0 before:-z-10 before:rounded-xl before:bg-gradient-to-r before:from-violet-500/25 before:via-indigo-500/25 before:to-purple-500/25 before:p-0.5 before:opacity-0 hover:before:opacity-100 before:transition;
+    @apply before:absolute before:inset-0 before:-z-10 before:rounded-xl 
+           dark:before:bg-gradient-to-r dark:before:from-violet-500/25 dark:before:via-indigo-500/25 dark:before:to-purple-500/25
+           before:bg-gradient-to-r before:from-violet-300/25 before:via-indigo-300/25 before:to-purple-300/25 
+           before:p-0.5 before:opacity-0 hover:before:opacity-100 before:transition;
   }
 }
 
 /* Markdown styling */
 .markdown {
-  @apply text-slate-200;
+  @apply dark:text-slate-200 text-slate-800;
 }
 
 .markdown h1 {
-  @apply text-2xl font-bold mb-4 text-white;
+  @apply text-2xl font-bold mb-4 dark:text-white text-slate-900;
 }
 
 .markdown h2 {
-  @apply text-xl font-bold mb-3 text-white;
+  @apply text-xl font-bold mb-3 dark:text-white text-slate-900;
 }
 
 .markdown h3 {
-  @apply text-lg font-bold mb-3 text-white;
+  @apply text-lg font-bold mb-3 dark:text-white text-slate-900;
 }
 
 .markdown h4 {
-  @apply text-base font-bold mb-2 text-white;
+  @apply text-base font-bold mb-2 dark:text-white text-slate-900;
 }
 
 .markdown p {
@@ -106,27 +142,31 @@
 }
 
 .markdown a {
-  @apply text-indigo-400 hover:text-indigo-300 underline;
+  @apply dark:text-indigo-400 dark:hover:text-indigo-300 text-indigo-600 hover:text-indigo-500 underline;
 }
 
 .markdown blockquote {
-  @apply border-l-4 border-indigo-500/50 pl-4 italic text-slate-300 my-4;
+  @apply dark:border-l-4 dark:border-indigo-500/50 dark:pl-4 dark:italic dark:text-slate-300 dark:my-4
+         border-l-4 border-indigo-700/50 pl-4 italic text-slate-700 my-4;
 }
 
 .markdown code {
-  @apply bg-slate-800 px-1 py-0.5 rounded text-sm text-slate-200 font-mono;
+  @apply dark:bg-slate-800 dark:text-slate-200
+         bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-sm font-mono;
 }
 
 .markdown pre {
-  @apply bg-slate-900 p-4 rounded-md my-4 overflow-x-auto border border-slate-800;
+  @apply dark:bg-slate-900 dark:border-slate-800
+         bg-slate-100 border-slate-200 p-4 rounded-md my-4 overflow-x-auto border;
 }
 
 .markdown pre code {
-  @apply bg-transparent p-0 text-slate-200;
+  @apply dark:bg-transparent dark:text-slate-200
+         bg-transparent text-slate-800 p-0;
 }
 
 .markdown strong {
-  @apply font-bold text-white;
+  @apply dark:text-white text-slate-900 font-bold;
 }
 
 .markdown em {
@@ -138,9 +178,30 @@
 }
 
 .markdown th, .markdown td {
-  @apply border border-slate-700 px-3 py-2;
+  @apply dark:border-slate-700 border-slate-300 px-3 py-2 border;
 }
 
 .markdown th {
-  @apply bg-slate-800 text-left;
+  @apply dark:bg-slate-800 bg-slate-100 text-left;
+}
+
+/* Scrollbar styling */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply dark:bg-slate-700 bg-slate-300 rounded-full;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  @apply dark:bg-slate-600 bg-slate-400;
 }

@@ -6,6 +6,8 @@ import { PopIn } from '@/components/UI/AnimatedContainer';
 import { User, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { CodeBlock } from './CodeBlock';
+import { VoiceOutput } from './VoiceOutput';
 
 interface ChatMessageProps {
   message: Message;
@@ -32,6 +34,25 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
       setRendered(message.content);
     }
   }, [message.content, message.role, isLatest]);
+  
+  // Custom components for ReactMarkdown
+  const components = {
+    code({ node, inline, className, children, ...props }: any) {
+      const match = /language-(\w+)/.exec(className || '');
+      
+      return !inline && match ? (
+        <CodeBlock
+          code={String(children).replace(/\n$/, '')}
+          language={match[1]}
+          {...props}
+        />
+      ) : (
+        <code className={className} {...props}>
+          {children}
+        </code>
+      );
+    }
+  };
   
   return (
     <PopIn 
@@ -74,15 +95,23 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
         </div>
         <div className="prose prose-sm max-w-none prose-invert">
           {message.role === 'assistant' && isLatest ? (
-            <ReactMarkdown className="markdown">
+            <ReactMarkdown className="markdown" components={components}>
               {rendered}
             </ReactMarkdown>
           ) : (
-            <ReactMarkdown className="markdown">
+            <ReactMarkdown className="markdown" components={components}>
               {message.content}
             </ReactMarkdown>
           )}
         </div>
+        
+        {/* Voice output component for assistant messages only */}
+        {message.role === 'assistant' && (
+          <VoiceOutput 
+            text={message.content} 
+            isLatestMessage={isLatest}
+          />
+        )}
       </div>
     </PopIn>
   );

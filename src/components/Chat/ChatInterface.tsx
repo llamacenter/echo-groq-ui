@@ -3,17 +3,25 @@ import { useState, useRef, useEffect } from 'react';
 import { useChat, MODELS } from '@/hooks/useChat';
 import { ChatMessage } from '@/components/Chat/ChatMessage';
 import { ModelSelector } from '@/components/Chat/ModelSelector';
+import { VoiceInput } from '@/components/Chat/VoiceInput';
+import { FileUpload } from '@/components/Chat/FileUpload';
+import { ThemeToggle } from '@/components/UI/ThemeToggle';
 import { GradientButton } from '@/components/UI/GradientButton';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AnimatedContainer, SlideIn } from '@/components/UI/AnimatedContainer';
-import { Send, Trash2, KeyRound, Sparkles, Bot as BotIcon, Command, RefreshCw } from 'lucide-react';
+import { 
+  Send, Trash2, KeyRound, Sparkles, Bot as BotIcon, 
+  Command, RefreshCw, PaperclipIcon
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 export const ChatInterface = () => {
   const [input, setInput] = useState('');
   const [errorState, setErrorState] = useState(false);
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
@@ -33,9 +41,20 @@ export const ChatInterface = () => {
     e.preventDefault();
     if (input.trim() && status !== 'loading' && status !== 'streaming') {
       try {
-        await sendMessage(input);
+        // If files are selected, mention them in the message
+        let messageText = input;
+        if (selectedFiles.length > 0) {
+          const fileNames = selectedFiles.map(f => f.name).join(', ');
+          messageText += `\n\n(Uploaded files: ${fileNames})`;
+          // In a real implementation, we would upload the files to a server
+          // or process them here before sending the message
+        }
+        
+        await sendMessage(messageText);
         setInput('');
         setErrorState(false);
+        setShowFileUpload(false);
+        setSelectedFiles([]);
       } catch (error) {
         setErrorState(true);
       }
@@ -56,6 +75,20 @@ export const ChatInterface = () => {
       handleSubmit(e);
     }
   };
+
+  const handleFileSelect = (files: File[]) => {
+    setSelectedFiles(prev => [...prev, ...files]);
+    toast.success(`${files.length} file(s) added`);
+  };
+
+  const handleFileRemove = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleVoiceTranscription = (text: string) => {
+    setInput(prev => prev + (prev ? ' ' : '') + text);
+    toast.success("Voice transcription added to message");
+  };
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -73,11 +106,12 @@ export const ChatInterface = () => {
     <div className="flex flex-col h-full">
       <div className="flex-shrink-0 pb-4">
         <AnimatedContainer className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4">
-          <div className="space-y-1">
+          <div className="space-y-1 flex items-center gap-3">
             <h1 className="text-3xl font-bold text-gradient flex items-center gap-2">
               <Sparkles className="h-6 w-6" /> Prism
             </h1>
-            <p className="text-sm text-slate-400">
+            <ThemeToggle />
+            <p className="text-sm text-slate-400 hidden md:block">
               A powerful interface for Groq's advanced language models
             </p>
           </div>
@@ -162,6 +196,16 @@ export const ChatInterface = () => {
               </div>
             )}
             
+            {showFileUpload && (
+              <div className="mb-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                <FileUpload 
+                  onFileSelect={handleFileSelect}
+                  selectedFiles={selectedFiles}
+                  onFileRemove={handleFileRemove}
+                />
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="flex gap-2">
               <div className="relative flex-grow">
                 <Input
@@ -177,6 +221,21 @@ export const ChatInterface = () => {
                   <Command className="h-3 w-3" /> Enter
                 </span>
               </div>
+              
+              <VoiceInput 
+                onTranscription={handleVoiceTranscription}
+                isDisabled={isLoading}
+              />
+              
+              <Button 
+                variant="outline" 
+                size="icon"
+                type="button"
+                onClick={() => setShowFileUpload(!showFileUpload)}
+                className={`text-slate-400 border-slate-700 ${showFileUpload ? 'bg-indigo-900/20 text-indigo-300' : 'hover:bg-slate-800'}`}
+              >
+                <PaperclipIcon className="h-4 w-4" />
+              </Button>
               
               <GradientButton 
                 type="submit"
