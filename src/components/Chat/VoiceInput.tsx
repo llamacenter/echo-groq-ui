@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff } from 'lucide-react';
@@ -114,16 +113,23 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTranscript, isDisabled
   return (
     <Button
       onClick={toggleRecording}
-      variant="ghost"
+      variant="outline"
       size="icon"
       disabled={isDisabled}
-      className={`relative w-9 h-9 rounded-full ${isRecording ? 'text-rose-500 animate-pulse' : 'text-slate-400 hover:text-white'}`}
+      className={`relative w-10 h-10 rounded-xl border-border/50 transition-all duration-200 ${
+        isRecording 
+          ? 'bg-red-500/10 text-red-500 border-red-500/30 animate-pulse' 
+          : 'bg-background/50 backdrop-blur-sm hover:bg-muted/50'
+      }`}
       title={isRecording ? "Stop recording" : "Start voice input"}
     >
       {isRecording ? (
-        <MicOff className="h-[1.2rem] w-[1.2rem]" />
+        <MicOff className="h-4 w-4" />
       ) : (
-        <Mic className="h-[1.2rem] w-[1.2rem]" />
+        <Mic className="h-4 w-4" />
+      )}
+      {isRecording && (
+        <div className="absolute inset-0 rounded-xl bg-red-500/20 animate-ping" />
       )}
     </Button>
   );

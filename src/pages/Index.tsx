@@ -6,18 +6,26 @@ import { ThemeProvider } from "@/lib/theme";
 const Index = () => {
   return (
     <ThemeProvider>
-      <motion.div 
-        className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 dark:bg-gradient-to-br dark:from-slate-100 dark:via-slate-200 dark:to-slate-100"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(76,29,149,0.15),rgba(0,0,0,0)_40%)] dark:bg-[radial-gradient(circle_at_center,rgba(76,29,149,0.05),rgba(255,255,255,0)_40%)] pointer-events-none"></div>
-        
-        <div className="container mx-auto px-4 py-8 h-[calc(100vh-2rem)]">
-          <ChatInterface />
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
         </div>
-      </motion.div>
+        
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] pointer-events-none" />
+        
+        <motion.div 
+          className="relative z-10 container mx-auto px-4 py-6 h-screen flex flex-col"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <ChatInterface />
+        </motion.div>
+      </div>
     </ThemeProvider>
   );
 };
