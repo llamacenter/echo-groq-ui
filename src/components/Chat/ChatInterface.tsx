@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useChat, MODELS } from '@/hooks/useChat';
 import { ChatMessage } from '@/components/Chat/ChatMessage';
@@ -223,7 +222,7 @@ export const ChatInterface = () => {
               </div>
               
               <VoiceInput 
-                onTranscription={handleVoiceTranscription}
+                onTranscript={handleVoiceTranscription}
                 isDisabled={isLoading}
               />
               

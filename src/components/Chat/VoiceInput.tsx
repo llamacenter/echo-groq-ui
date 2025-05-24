@@ -52,9 +52,10 @@ declare global {
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
+  isDisabled?: boolean;
 }
 
-export const VoiceInput: React.FC<VoiceInputProps> = ({ onTranscript }) => {
+export const VoiceInput: React.FC<VoiceInputProps> = ({ onTranscript, isDisabled = false }) => {
   const [isRecording, setIsRecording] = useState(false);
   const recognition = useRef<SpeechRecognition | null>(null);
 
@@ -115,6 +116,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTranscript }) => {
       onClick={toggleRecording}
       variant="ghost"
       size="icon"
+      disabled={isDisabled}
       className={`relative w-9 h-9 rounded-full ${isRecording ? 'text-rose-500 animate-pulse' : 'text-slate-400 hover:text-white'}`}
       title={isRecording ? "Stop recording" : "Start voice input"}
     >
