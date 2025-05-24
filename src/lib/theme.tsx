@@ -10,7 +10,6 @@ interface ThemeContextType {
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// Use a regular function without JSX
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark');
 
@@ -29,14 +28,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.className = newTheme;
   };
 
-  // Instead of using JSX, use the createElement approach for a .ts file
-  return {
-    theme,
-    toggleTheme,
-    Provider: function Provider({ children }: { children: ReactNode }) {
-      return createContext.Provider({ value: { theme, toggleTheme }, children });
-    }
-  };
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
 export const useTheme = () => {
