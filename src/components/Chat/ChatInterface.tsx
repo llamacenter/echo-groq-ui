@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { 
   Send, Trash2, KeyRound, Bot as BotIcon, 
-  RefreshCw, PaperclipIcon, MessageSquare, Code, FileText, Lightbulb
+  RefreshCw, PaperclipIcon, MessageSquare, Code, FileText, Lightbulb, Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -97,56 +97,69 @@ export const ChatInterface = () => {
   const isLoading = status === 'loading' || status === 'streaming';
 
   const quickActions = [
-    { icon: Lightbulb, title: "Ideas", prompt: "Help me brainstorm ideas for " },
-    { icon: Code, title: "Code", prompt: "Help me write code for " },
-    { icon: FileText, title: "Writing", prompt: "Help me write content about " },
-    { icon: MessageSquare, title: "Chat", prompt: "Let's discuss " }
+    { icon: Lightbulb, title: "Creative Ideas", prompt: "Help me brainstorm creative ideas for ", color: "from-yellow-500/20 to-orange-500/20" },
+    { icon: Code, title: "Code Assistant", prompt: "Help me write and debug code for ", color: "from-green-500/20 to-emerald-500/20" },
+    { icon: FileText, title: "Content Writing", prompt: "Help me write professional content about ", color: "from-purple-500/20 to-indigo-500/20" },
+    { icon: MessageSquare, title: "Deep Discussion", prompt: "Let's have an in-depth discussion about ", color: "from-blue-500/20 to-cyan-500/20" }
   ];
   
   return (
     <div className="flex h-full max-w-7xl mx-auto">
-      {/* Sidebar */}
-      <div className="w-80 border-r border-border/30 bg-card/30">
-        <div className="p-4 h-full flex flex-col">
-          {/* Controls Section */}
-          <div className="space-y-4 mb-6">
-            <h2 className="text-sm font-medium text-foreground">Settings</h2>
-            
-            <ModelSelector
-              models={MODELS}
-              selectedModel={selectedModel}
-              onSelect={setSelectedModel}
-            />
-            
-            <div className="relative">
-              <Input
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                type="password"
-                placeholder="Enter your Groq API key"
-                className="chat-input pr-10"
-              />
-              <KeyRound className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      {/* Enhanced Sidebar */}
+      <div className="w-80 sidebar-modern animate-slide-in-left">
+        <div className="p-6 h-full flex flex-col">
+          {/* Settings Section */}
+          <div className="space-y-6 mb-8">
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Sparkles className="h-3 w-3 text-white" />
+              </div>
+              <h2 className="text-sm font-semibold gradient-text">AI Settings</h2>
             </div>
             
-            <ThemeToggle />
+            <div className="space-y-4">
+              <ModelSelector
+                models={MODELS}
+                selectedModel={selectedModel}
+                onSelect={setSelectedModel}
+              />
+              
+              <div className="relative">
+                <Input
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  type="password"
+                  placeholder="Enter your Groq API key"
+                  className="chat-input-modern pl-10"
+                />
+                <KeyRound className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500" />
+              </div>
+              
+              <ThemeToggle />
+            </div>
           </div>
 
           {/* Quick Actions */}
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-foreground mb-3">Quick Actions</h3>
-            <div className="space-y-2">
-              {quickActions.map((action) => (
+            <h3 className="text-sm font-semibold gradient-text mb-4 flex items-center space-x-2">
+              <span>Quick Actions</span>
+            </h3>
+            <div className="space-y-3">
+              {quickActions.map((action, index) => (
                 <button
                   key={action.title}
                   onClick={() => setInput(action.prompt)}
-                  className="w-full text-left p-3 feature-card rounded-lg hover:bg-muted/50 transition-all duration-200"
+                  className="w-full text-left action-card rounded-xl p-4 animate-scale-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-md bg-primary/10">
-                      <action.icon className="h-4 w-4 text-primary" />
+                    <div className={`p-3 rounded-lg bg-gradient-to-br ${action.color} backdrop-blur-sm`}>
+                      <action.icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">{action.title}</span>
+                    <div>
+                      <span className="text-sm font-medium text-foreground">{action.title}</span>
+                      <p className="text-xs text-muted-foreground mt-1">AI-powered assistance</p>
+                    </div>
                   </div>
                 </button>
               ))}
@@ -160,56 +173,62 @@ export const ChatInterface = () => {
                 clearChat();
                 toast.success("Chat cleared");
               }}
-              className="w-full mt-4 p-3 border border-destructive/20 rounded-lg text-destructive hover:bg-destructive/5 transition-colors duration-200 flex items-center justify-center space-x-2"
+              className="w-full mt-6 p-4 glass-card rounded-xl text-red-500 hover:bg-red-500/5 transition-all duration-300 flex items-center justify-center space-x-2 group"
             >
-              <Trash2 className="h-4 w-4" />
-              <span className="text-sm font-medium">Clear Chat</span>
+              <Trash2 className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium">Clear Conversation</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-background">
+      <div className="flex-1 flex flex-col bg-transparent">
         {/* Chat Messages */}
-        <div className="flex-1 p-6 overflow-auto scrollbar-thin">
+        <div className="flex-1 p-6 overflow-auto scrollbar-modern">
           {messages.length > 0 ? (
-            <div className="space-y-6 max-w-4xl mx-auto">
+            <div className="space-y-8 max-w-4xl mx-auto">
               {messages.map((message, index) => (
-                <ChatMessage 
-                  key={message.id} 
-                  message={message} 
-                  isLatest={index === messages.length - 1 && message.role === 'assistant'}
-                />
+                <div key={message.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <ChatMessage 
+                    message={message} 
+                    isLatest={index === messages.length - 1 && message.role === 'assistant'}
+                  />
+                </div>
               ))}
               <div ref={messagesEndRef} />
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
-              <div className="w-16 h-16 mx-auto rounded-xl bg-primary/10 flex items-center justify-center mb-6">
-                <BotIcon className="h-8 w-8 text-primary" />
+            <div className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto animate-fade-in-up">
+              <div className="relative mb-8">
+                <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center animate-glow-pulse">
+                  <BotIcon className="h-10 w-10 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                </div>
               </div>
               
-              <div className="space-y-3">
-                <h2 className="text-xl font-semibold text-foreground">Welcome to Prism AI</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  Start a conversation by typing a message or selecting a quick action from the sidebar.
+              <div className="space-y-4 animate-slide-in-left" style={{ animationDelay: '0.3s' }}>
+                <h2 className="text-2xl font-bold gradient-text">Welcome to Prism AI</h2>
+                <p className="text-muted-foreground leading-relaxed text-lg">
+                  Experience the future of AI conversation. Choose a quick action or start typing to begin.
                 </p>
               </div>
             </div>
           )}
         </div>
         
-        {/* Input Area */}
-        <div className="border-t border-border/30 bg-card/30 p-4">
+        {/* Enhanced Input Area */}
+        <div className="glass-card border-t border-blue-500/10 p-6 m-4 rounded-2xl">
           {errorState && messages.length > 0 && (
-            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center justify-between">
-              <span className="text-sm text-destructive">Failed to get a response. Please try again.</span>
+            <div className="mb-4 p-4 glass-card border border-red-500/20 rounded-xl flex items-center justify-between animate-scale-in">
+              <span className="text-sm text-red-500">Failed to get a response. Please try again.</span>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={handleRetry}
-                className="border-destructive/20 hover:bg-destructive/10"
+                className="border-red-500/20 hover:bg-red-500/10 btn-glow"
               >
                 <RefreshCw className="h-3 w-3 mr-2" />
                 Retry
@@ -218,7 +237,7 @@ export const ChatInterface = () => {
           )}
           
           {showFileUpload && (
-            <div className="mb-4 p-4 bg-muted/30 border border-border/30 rounded-lg">
+            <div className="mb-4 p-4 glass-card border border-blue-500/20 rounded-xl animate-scale-in">
               <FileUpload 
                 onFileSelect={handleFileSelect}
                 selectedFiles={selectedFiles}
@@ -227,16 +246,16 @@ export const ChatInterface = () => {
             </div>
           )}
           
-          <form onSubmit={handleSubmit} className="flex gap-3 max-w-4xl mx-auto">
+          <form onSubmit={handleSubmit} className="flex gap-4 max-w-4xl mx-auto">
             <div className="flex-1">
               <Input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
+                placeholder="Type your message or ask anything..."
                 disabled={isLoading}
-                className="chat-input"
+                className="chat-input-modern h-12 text-base"
               />
             </div>
             
@@ -250,7 +269,7 @@ export const ChatInterface = () => {
               onClick={() => setShowFileUpload(!showFileUpload)}
               variant="outline"
               size="icon"
-              className={showFileUpload ? 'bg-primary/10 border-primary/30' : ''}
+              className={`h-12 w-12 glass-card transition-all duration-300 ${showFileUpload ? 'bg-blue-500/10 border-blue-500/30' : ''}`}
             >
               <PaperclipIcon className="h-4 w-4" />
             </Button>
@@ -258,9 +277,10 @@ export const ChatInterface = () => {
             <Button 
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="btn-glow h-12 px-6 font-medium"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-4 w-4 mr-2" />
+              Send
             </Button>
           </form>
         </div>

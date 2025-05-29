@@ -53,53 +53,65 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
   
   return (
     <div className={cn(
-      "flex gap-4",
+      "flex gap-6 group",
       message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
     )}>
-      {/* Avatar */}
+      {/* Enhanced Avatar */}
       <div className="flex-shrink-0">
         <div className={cn(
-          "w-8 h-8 rounded-lg flex items-center justify-center",
+          "w-10 h-10 rounded-xl flex items-center justify-center relative transition-all duration-300 group-hover:scale-105",
           message.role === 'user' 
-            ? 'bg-primary text-primary-foreground' 
-            : 'bg-muted text-foreground'
+            ? 'chat-bubble-user-modern' 
+            : 'glass-card'
         )}>
           {message.role === 'user' ? (
-            <User className="w-4 h-4" />
+            <User className="w-5 h-5 text-white" />
           ) : (
-            <Bot className="w-4 h-4" />
+            <Bot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          )}
+          
+          {/* Status indicator for AI */}
+          {message.role === 'assistant' && (
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gradient-to-br from-green-400 to-green-500 rounded-full border-2 border-background">
+              <div className="w-full h-full bg-green-400 rounded-full animate-pulse"></div>
+            </div>
           )}
         </div>
       </div>
       
       {/* Message Content */}
       <div className={cn(
-        "flex-1 space-y-2 max-w-[80%]",
+        "flex-1 space-y-3 max-w-[85%]",
         message.role === 'user' ? 'items-end' : 'items-start'
       )}>
         {/* Header */}
         <div className={cn(
-          "flex items-center gap-2 text-xs text-muted-foreground",
+          "flex items-center gap-3 text-xs",
           message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
         )}>
-          <span className="font-medium">
+          <span className="font-semibold text-foreground">
             {message.role === 'user' ? 'You' : 'Prism AI'}
           </span>
-          <span>
+          <span className="text-muted-foreground">
             {new Intl.DateTimeFormat('en-US', { 
               hour: 'numeric', 
               minute: 'numeric',
               hour12: true 
             }).format(message.createdAt)}
           </span>
+          {message.role === 'assistant' && (
+            <div className="px-2 py-1 glass-card rounded-full">
+              <span className="text-xs font-medium text-blue-600 dark:text-blue-400">AI</span>
+            </div>
+          )}
         </div>
         
         {/* Message Bubble */}
         <div className={cn(
-          "p-4 rounded-lg",
+          "p-5 rounded-2xl transition-all duration-300 group-hover:shadow-lg",
           message.role === 'user' 
-            ? 'chat-bubble-user ml-auto' 
-            : 'chat-bubble-assistant mr-auto'
+            ? 'chat-bubble-user-modern ml-auto' 
+            : 'chat-bubble-assistant-modern mr-auto'
         )}>
           <div className="prose prose-sm max-w-none">
             {message.role === 'assistant' && isLatest ? (
@@ -113,29 +125,31 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
             )}
           </div>
           
-          {/* Typing indicator */}
+          {/* Enhanced typing indicator */}
           {message.role === 'assistant' && isLatest && rendered.length < message.content.length && (
-            <div className="flex items-center space-x-1 mt-2">
+            <div className="flex items-center space-x-2 mt-4 pt-3 border-t border-white/10">
               <div className="flex space-x-1">
                 {[0, 1, 2].map((i) => (
                   <div
                     key={i}
-                    className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse"
-                    style={{ animationDelay: `${i * 0.2}s` }}
+                    className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
+                    style={{ animationDelay: `${i * 0.15}s` }}
                   />
                 ))}
               </div>
-              <span className="text-xs text-muted-foreground ml-2">typing...</span>
+              <span className="text-xs text-blue-300 font-medium">Prism AI is thinking...</span>
             </div>
           )}
         </div>
         
         {/* Voice output for assistant messages */}
         {message.role === 'assistant' && (
-          <VoiceOutput 
-            text={message.content} 
-            isLatestMessage={isLatest}
-          />
+          <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <VoiceOutput 
+              text={message.content} 
+              isLatestMessage={isLatest}
+            />
+          </div>
         )}
       </div>
     </div>
