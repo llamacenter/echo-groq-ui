@@ -11,26 +11,38 @@ export const ThemeToggle: React.FC = () => {
   return (
     <Button
       variant="outline"
-      size="icon"
       onClick={toggleTheme}
-      className="relative w-10 h-10 rounded-xl border-border/50 bg-background/50 backdrop-blur-sm hover:bg-muted/50 transition-all duration-200"
+      className="relative w-full justify-start glass-morphism border-border/30 hover:scale-105 transition-all duration-200"
       title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
     >
       <motion.div
+        className="flex items-center space-x-3"
         initial={false}
         animate={{ 
           rotate: theme === 'dark' ? 0 : 180,
-          scale: theme === 'dark' ? 1 : 0.8
         }}
         transition={{ duration: 0.3, type: 'spring', stiffness: 200 }}
-        className="absolute inset-0 flex items-center justify-center"
       >
         {theme === 'dark' ? (
-          <Moon className="h-4 w-4" />
+          <>
+            <Moon className="h-4 w-4" />
+            <span className="text-sm font-medium">Dark Mode</span>
+          </>
         ) : (
-          <Sun className="h-4 w-4" />
+          <>
+            <Sun className="h-4 w-4" />
+            <span className="text-sm font-medium">Light Mode</span>
+          </>
         )}
       </motion.div>
+      
+      {/* Animated background */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg"
+        initial={{ opacity: 0 }}
+        whileHover={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+      />
     </Button>
   );
 };

@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { cn } from '@/lib/utils';
-import { PopIn } from '@/components/UI/AnimatedContainer';
 import { User, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -27,7 +26,7 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
         } else {
           clearInterval(interval);
         }
-      }, 15);
+      }, 20);
       
       return () => clearInterval(interval);
     } else {
@@ -35,7 +34,6 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
     }
   }, [message.content, message.role, isLatest]);
   
-  // Custom components for ReactMarkdown
   const components = {
     code({ node, inline, className, children, ...props }: any) {
       const match = /language-(\w+)/.exec(className || '');
@@ -55,37 +53,55 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
   };
   
   return (
-    <PopIn 
+    <motion.div 
       className={cn(
-        "py-6 px-4 flex gap-4 rounded-xl",
-        message.role === 'assistant' ? 'glass-light' : 'bg-transparent'
+        "flex gap-4 group",
+        message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
       )}
-      delay={0.1}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      layout
     >
-      <div className="flex-shrink-0">
-        <motion.div 
-          className={cn(
-            "w-8 h-8 flex items-center justify-center rounded-full",
-            message.role === 'user' 
-              ? 'bg-indigo-950/60 text-indigo-300 border border-indigo-700/50' 
-              : 'bg-purple-950/60 text-purple-300 border border-purple-700/50'
-          )}
-          whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-        >
+      {/* Avatar */}
+      <motion.div 
+        className="flex-shrink-0 relative"
+        whileHover={{ scale: 1.1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      >
+        <div className={cn(
+          "w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg",
+          message.role === 'user' 
+            ? 'bg-gradient-to-br from-indigo-500 to-purple-600' 
+            : 'glass-morphism border-2 border-primary/20'
+        )}>
           {message.role === 'user' ? (
-            <User className="w-4 h-4" />
+            <User className="w-5 h-5 text-white" />
           ) : (
-            <Bot className="w-4 h-4" />
+            <Bot className="w-5 h-5 text-primary" />
           )}
-        </motion.div>
-      </div>
+        </div>
+        
+        {/* Online indicator for assistant */}
+        {message.role === 'assistant' && (
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse-soft" />
+        )}
+      </motion.div>
       
-      <div className="flex-grow space-y-1.5">
-        <div className="text-sm font-medium flex items-center gap-2">
-          {message.role === 'user' ? 'You' : (
-            <span className="text-gradient">Prism</span>
-          )}
-          <span className="text-xs text-slate-500">
+      {/* Message Content */}
+      <div className={cn(
+        "flex-1 space-y-2 max-w-[80%]",
+        message.role === 'user' ? 'items-end' : 'items-start'
+      )}>
+        {/* Header */}
+        <div className={cn(
+          "flex items-center gap-2 text-xs text-muted-foreground",
+          message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+        )}>
+          <span className="font-medium">
+            {message.role === 'user' ? 'You' : 'Prism AI'}
+          </span>
+          <span>
             {new Intl.DateTimeFormat('en-US', { 
               hour: 'numeric', 
               minute: 'numeric',
@@ -93,26 +109,71 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
             }).format(message.createdAt)}
           </span>
         </div>
-        <div className="prose prose-sm max-w-none prose-invert">
-          {message.role === 'assistant' && isLatest ? (
-            <ReactMarkdown className="markdown" components={components}>
-              {rendered}
-            </ReactMarkdown>
-          ) : (
-            <ReactMarkdown className="markdown" components={components}>
-              {message.content}
-            </ReactMarkdown>
-          )}
-        </div>
         
-        {/* Voice output component for assistant messages only */}
+        {/* Message Bubble */}
+        <motion.div 
+          className={cn(
+            "p-4 rounded-2xl shadow-sm relative",
+            message.role === 'user' 
+              ? 'chat-bubble-user' 
+              : 'chat-bubble-assistant'
+          )}
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.1, duration: 0.2 }}
+        >
+          <div className="prose prose-sm max-w-none">
+            {message.role === 'assistant' && isLatest ? (
+              <ReactMarkdown className="markdown" components={components}>
+                {rendered}
+              </ReactMarkdown>
+            ) : (
+              <ReactMarkdown className="markdown" components={components}>
+                {message.content}
+              </ReactMarkdown>
+            )}
+          </div>
+          
+          {/* Typing indicator */}
+          {message.role === 'assistant' && isLatest && rendered.length < message.content.length && (
+            <motion.div 
+              className="flex items-center space-x-1 mt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <div className="flex space-x-1">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1.5 h-1.5 bg-primary/60 rounded-full"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ 
+                      duration: 0.6, 
+                      repeat: Infinity, 
+                      delay: i * 0.2 
+                    }}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-muted-foreground ml-2">typing...</span>
+            </motion.div>
+          )}
+        </motion.div>
+        
+        {/* Voice output for assistant messages */}
         {message.role === 'assistant' && (
-          <VoiceOutput 
-            text={message.content} 
-            isLatestMessage={isLatest}
-          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <VoiceOutput 
+              text={message.content} 
+              isLatestMessage={isLatest}
+            />
+          </motion.div>
         )}
       </div>
-    </PopIn>
+    </motion.div>
   );
 };
